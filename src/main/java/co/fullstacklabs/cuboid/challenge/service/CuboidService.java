@@ -2,7 +2,6 @@ package co.fullstacklabs.cuboid.challenge.service;
 
 import co.fullstacklabs.cuboid.challenge.dto.CuboidDTO;
 import co.fullstacklabs.cuboid.challenge.model.Cuboid;
-
 import java.util.List;
 
 /**
