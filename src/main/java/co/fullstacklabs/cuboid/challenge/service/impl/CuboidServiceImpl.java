@@ -2,6 +2,7 @@ package co.fullstacklabs.cuboid.challenge.service.impl;
 
 import co.fullstacklabs.cuboid.challenge.dto.CuboidDTO;
 import co.fullstacklabs.cuboid.challenge.exception.ResourceNotFoundException;
+import co.fullstacklabs.cuboid.challenge.exception.UnprocessableEntityException;
 import co.fullstacklabs.cuboid.challenge.model.Bag;
 import co.fullstacklabs.cuboid.challenge.model.Cuboid;
 import co.fullstacklabs.cuboid.challenge.repository.BagRepository;
@@ -11,8 +12,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -64,10 +65,42 @@ public class CuboidServiceImpl implements CuboidService {
         return cuboids.stream().map(bag -> mapper.map(bag, CuboidDTO.class))
                 .collect(Collectors.toList());
     }
+
     private Bag getBagById(long bagId) {
-        return bagRepository.findById(bagId).orElseThrow(() -> new ResourceNotFoundException("Bag not found"));
+        return bagRepository
+                .findById(bagId)
+                .orElseThrow(() -> new ResourceNotFoundException("Object Bag not found!"));
     }
 
+    @Override
+    public Cuboid getById(Long id) {
 
-  
+        Optional<Cuboid> cuboid = repository.findById(id);
+
+        if (cuboid.isPresent()) {
+            return cuboid.get();
+        } else {
+            throw new ResourceNotFoundException("Object Cuboid not found!");
+        }
+    }
+
+    @Override
+    public CuboidDTO update(CuboidDTO dto) {
+
+        Bag bag = getBagById(dto.getBagId());
+        Cuboid cuboid = mapper.map(dto, Cuboid.class);
+        cuboid.setBag(bag);
+
+        if (dto.getVolume() > bag.getVolume()) {
+            throw new UnprocessableEntityException("Bag capacity is not enough!");
+        }
+
+        var cuboidGet = this.getById(cuboid.getId());
+        if (cuboidGet.getId() > 0) {
+            cuboid = repository.save(cuboid);
+        }
+
+        return mapper.map(cuboid, CuboidDTO.class);
+    }
+
 }
