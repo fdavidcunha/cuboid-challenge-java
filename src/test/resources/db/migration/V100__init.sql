@@ -5,7 +5,7 @@ create sequence IF NOT EXISTS hibernate_sequence start with 4 increment by 1;
 CREATE TABLE "BAGS" (
     "ID" bigint not null, 
     "VOLUME" double not null,
-    "TITLE" varchar not null,
+    "TITLE" varchar(100) not null,
      primary key ("ID")
 );
 

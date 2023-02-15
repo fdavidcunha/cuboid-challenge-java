@@ -1,7 +1,6 @@
 package co.fullstacklabs.cuboid.challenge.service;
 
 import co.fullstacklabs.cuboid.challenge.dto.CuboidDTO;
-import co.fullstacklabs.cuboid.challenge.model.Cuboid;
 import java.util.List;
 
 /**
@@ -13,7 +12,7 @@ public interface CuboidService {
 
     CuboidDTO create(CuboidDTO cuboid);
     List<CuboidDTO> getAll();
-    CuboidDTO update(CuboidDTO dto);
-    Cuboid getById(Long id);
+    CuboidDTO update(Long id, CuboidDTO cuboidDTO);
+    void delete(Long id);
 
 }

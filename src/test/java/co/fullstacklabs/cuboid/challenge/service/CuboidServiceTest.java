@@ -1,12 +1,9 @@
 package co.fullstacklabs.cuboid.challenge.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.util.List;
 import java.util.Optional;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.modelmapper.ModelMapper;
-
 import co.fullstacklabs.cuboid.challenge.dto.CuboidDTO;
 import co.fullstacklabs.cuboid.challenge.exception.ResourceNotFoundException;
 import co.fullstacklabs.cuboid.challenge.exception.UnprocessableEntityException;
@@ -42,31 +38,173 @@ class CuboidServiceTest {
 
     @Test
     void updateWithSuccess() {
-        assertTrue(true);
+
+        long id = 1L;
+
+        Bag bag = BagTestBuilder
+                .builder()
+                .id(1L)
+                .title("Title 1")
+                .volume(20d)
+                .build();
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .width(2f)
+                .height(2f)
+                .depth(4f)
+                .id(id)
+                .bag(bag)
+                .build();
+
+        CuboidDTO cuboidDTO = CuboidDTO
+                .builder()
+                .width(cuboid.getWidth())
+                .height(cuboid.getHeight())
+                .depth(cuboid.getDepth())
+                .bagId(bag.getId())
+                .build();
+
+        Mockito.when(bagRepository.findById(cuboidDTO.getBagId())).thenReturn(Optional.of(bag));
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(cuboid));
+        Mockito.when(repository.save(Mockito.any(Cuboid.class))).thenReturn(cuboid);
+
+        cuboidService.update(id, cuboidDTO);
+
+        ArgumentCaptor<Cuboid> bagCaptor = ArgumentCaptor.forClass(Cuboid.class);
+        Mockito.verify(bagRepository).findById(cuboidDTO.getBagId());
+        Mockito.verify(repository).findById(id);
+        Mockito.verify(repository).save(bagCaptor.capture());
+        Mockito.verify(mapper).map(cuboid, CuboidDTO.class);
+
+        assertEquals(cuboidDTO.getHeight(), bagCaptor.getValue().getHeight());
+        assertEquals(cuboidDTO.getWidth(), bagCaptor.getValue().getWidth());
+        assertEquals(cuboidDTO.getDepth(), bagCaptor.getValue().getDepth());
     }
 
     @Test
     void updateWithCuboidNotFound() {
-        assertTrue(true);
+        long id = 100L;
+
+        Bag bag = BagTestBuilder
+                .builder()
+                .id(1L)
+                .title("Title 1")
+                .volume(20d)
+                .build();
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .width(2f)
+                .height(2f)
+                .depth(4f)
+                .id(id)
+                .bag(bag)
+                .build();
+
+        CuboidDTO cuboidDTO = CuboidDTO
+                .builder()
+                .width(cuboid.getWidth())
+                .height(cuboid.getHeight())
+                .depth(cuboid.getDepth())
+                .bagId(bag.getId())
+                .build();
+
+        Mockito.when(repository.findById(id)).thenReturn(Optional.empty());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> cuboidService.update(id, cuboidDTO));
     }
 
     @Test
     void updateWithBagNotFound() {
-        assertTrue(true);
+
+        long id = 1L;
+
+        Bag bag = BagTestBuilder
+                .builder()
+                .id(20L)
+                .title("Title 1")
+                .volume(200d)
+                .build();
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .width(2f)
+                .height(3f)
+                .depth(4f)
+                .id(id)
+                .bag(bag)
+                .build();
+
+        CuboidDTO cuboidDTO = CuboidDTO
+                .builder()
+                .width(cuboid.getWidth())
+                .height(cuboid.getHeight())
+                .depth(cuboid.getDepth())
+                .bagId(bag.getId())
+                .build();
+
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(cuboid));
+        Mockito.when(bagRepository.findById(cuboidDTO.getBagId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> cuboidService.update(id, cuboidDTO));
     }
 
     @Test
     void updateWithBagNotEnoughCapacity() {
-        assertTrue(true);
+
+        long id = 1L;
+
+        Bag bag = BagTestBuilder
+                .builder()
+                .id(1L)
+                .title("Title 1")
+                .volume(20d)
+                .build();
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .width(2f)
+                .height(3f)
+                .depth(4f)
+                .id(id)
+                .bag(bag)
+                .build();
+
+        CuboidDTO cuboidDTO = CuboidDTO
+                .builder()
+                .width(cuboid.getWidth())
+                .height(cuboid.getHeight())
+                .depth(cuboid.getDepth())
+                .bagId(bag.getId())
+                .build();
+
+        Mockito.when(repository.findById(id)).thenReturn(Optional.of(cuboid));
+        Mockito.when(bagRepository.findById(cuboidDTO.getBagId())).thenReturn(Optional.of(bag));
+        Assertions.assertThrows(UnprocessableEntityException.class, () -> cuboidService.update(id, cuboidDTO));
     }
+
     @Test
     void deleteWithSuccess() {
-        assertTrue(true);
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .id(1L)
+                .build();
+
+        Mockito.when(repository.findById(cuboid.getId())).thenReturn(Optional.of(cuboid));
+        cuboidService.delete(cuboid.getId());
+        Mockito.verify(repository).deleteById(cuboid.getId());
     }
 
     @Test
     void deleteWithErrorNoCuboid() {
-        assertTrue(true);
+
+        Cuboid cuboid = CuboidTestBuilder
+                .builder()
+                .id(1L)
+                .build();
+
+        Mockito.when(repository.findById(cuboid.getId())).thenReturn(Optional.empty());
+        Assertions.assertThrows(ResourceNotFoundException.class, () -> cuboidService.delete(cuboid.getId()));
     }
 
     /************************************************************

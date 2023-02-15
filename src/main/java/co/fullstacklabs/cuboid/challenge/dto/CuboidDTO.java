@@ -1,7 +1,6 @@
 package co.fullstacklabs.cuboid.challenge.dto;
 
 import lombok.*;
-
 import javax.validation.constraints.NotNull;
 
 @Getter
@@ -10,6 +9,7 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 @Builder
 public class CuboidDTO {
+
     private Long id;
 
     @NotNull(message = "Cuboid width can't be null.")
@@ -21,8 +21,10 @@ public class CuboidDTO {
     @NotNull(message = "Cuboid depth can't be null.")
     private Float depth;
 
+    @NotNull(message = "Cuboid volume can't be null.")
     private Double volume;
 
     @NotNull(message = "Cuboid related bag can't be null.")
     private Long bagId;
+
 }

@@ -7,14 +7,14 @@ import lombok.Builder;
 public class CuboidTestBuilder {
 
     @Builder
-    public static Cuboid cuboid(Long id, float width, float height,
-                                float depth, Bag bag) {
+    public static Cuboid cuboid(Long id, float width, float height, float depth, Bag bag) {
         Cuboid cuboid = new Cuboid();
         cuboid.setId(id);
         cuboid.setWidth(width);
         cuboid.setHeight(height);
         cuboid.setDepth(depth);
         cuboid.setBag(bag);
+        cuboid.setVolume((double) (height * width * depth));
         return cuboid;
     }
 

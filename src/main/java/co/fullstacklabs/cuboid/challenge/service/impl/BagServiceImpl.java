@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,12 +20,12 @@ import java.util.stream.Collectors;
  * @version 1.0
  * @since 2021-10-22
  */
+
 @Service
 public class BagServiceImpl implements BagService {
    
     private BagRepository repository;   
     private ModelMapper mapper;
-
 
     @Autowired
     public BagServiceImpl(BagRepository repository, ModelMapper mapper){
@@ -55,7 +54,9 @@ public class BagServiceImpl implements BagService {
     @Transactional(readOnly = true)
     public List<BagDTO> getAll() {
         List<Bag> bags = repository.findAll();
-        return bags.stream().map(bag -> mapper.map(bag, BagDTO.class))
+        return bags
+                .stream()
+                .map(bag -> mapper.map(bag, BagDTO.class))
                 .collect(Collectors.toList());
     }
 
@@ -67,8 +68,8 @@ public class BagServiceImpl implements BagService {
     @Override
     @Transactional(readOnly = true)
     public BagDTO findById(long id) {
-        Bag bag = repository.findById(id).orElseThrow(
-                () -> new ResourceNotFoundException("Bag not found"));
+        Bag bag = repository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Object Bag not found!"));
         return mapper.map(bag, BagDTO.class);
     }
+
 }
